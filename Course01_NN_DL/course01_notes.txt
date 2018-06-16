@@ -1,0 +1,52 @@
+INDEX:
+== WEEK 1 - INTRODUCTION ==
+== WEEK 2 - NEURAL NETWORK BASICS ==
+== WEEK 3 - NEURAL NETWOKS FOR MACHINE LEARNING ==
+
+
+== WEEK 1 - INTRODUCTION ==
+> ReLU, rectified linear unit, can be used as the most basic neural network
+- Rectify input to a max of {0,function}
+> Dense connectivity ~ fully connected
+> Structured data = databases of data, where features are organised and defined
+> Unstructured data = raw data, like audio or images or text
+> Activation function for nodes:
+- ReLU function has a gradient of 1, so parameter (weight) learning via SGD is consistent
+- Sigmoid function approachs zero and 1 at a decreasing gradient, so learning via SGD can be very slow at the extremes
+
+== WEEK 2 - NEURAL NETWORK BASICS ==
+** Logistic Regression as a Neural Network
+> Notation:
+- m = # training examples
+- n(x) = dimensions of the number of features
+- x(1)y(1) = input and output for first training examples
+- X = matrix of training examples, [x(1)(1)-->x(m)(1) ; ... ; x(1)(n)--> x(m)(n)], ie: 1st column is all features for example 1, and last column (m) is all features for example m
+-- X {m columns, n rows}
+-- XεṞ(n(x)*m)
+- Y = 1 * m matrix of output / target
+- wεṞ(n(x))	==> n(x) weights associated with each feature for training example x; an n(x) dimensional vector
+- bεṞ		==> 1 bias associated with each training example x; a real number
+- the term := means to update
+- when noting  derivatives (slopes) of curves, if the curve changes with respect to a single variable we use lowercase d, and if the curve changes with respect to multiple variables we use lowercase ẟ as it's a "partial derivative"
+
+> Logistic regression
+- we want ŷ {0,1}, or a probability lying between 0 and 1
+- we apply a threshold to derive classification
+- sigmoid function, σ == logistic function = σ(w'x + b) = σ(z) =  1 / (1 + e^-z)
+
+Cost & Loss Function:
+- In logistic regression, the squared error loss function is not convex, with many local minima, so we define a different loss function
+> The loss function, as defined for a single training example:
+- L(ŷ-y) = - (y.log(ŷ) + (1-y).log(1-ŷ))
+> The cost function, as defined on the entire training set:
+- J(w,b) = 1/m Σ(i:m) L(ŷ(i),y(i))
+
+Gradient Descent Algorithm:
+- find w,b which minimise the cost function, J(w,b)
+- we initialise w,b, then use gradient descent to converge toward the global minima (optimum)
+- Repeat:
+-- update w, w:= w - α.dJ(w,b)/dw
+-- update b, b:= b - α.dJ(w,b)/db
+where alpha is the learning rate, multiplied by the derivative term or slope of the function
+- in code, we will denote the weight update as "dw" and the bias updated as "db"
+
