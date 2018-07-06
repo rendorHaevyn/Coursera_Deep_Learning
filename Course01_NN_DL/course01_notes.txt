@@ -1,7 +1,8 @@
 INDEX:
 == WEEK 1 - INTRODUCTION ==
 == WEEK 2 - NEURAL NETWORK BASICS ==
-== WEEK 3 - NEURAL NETWOKS FOR MACHINE LEARNING ==
+== WEEK 3 - SHALLOW NEURAL NETWOKS ==
+== WEEK 4 - DEEP NEURAL NETWORKS ==
 
 
 == WEEK 1 - INTRODUCTION ==
@@ -16,6 +17,7 @@ INDEX:
 
 == WEEK 2 - NEURAL NETWORK BASICS ==
 ** Logistic Regression as a Neural Network
+
 > Notation:
 - m = # training examples
 - n(x) = dimensions of the number of features
@@ -48,5 +50,109 @@ Gradient Descent Algorithm:
 -- update w, w:= w - α.dJ(w,b)/dw
 -- update b, b:= b - α.dJ(w,b)/db
 where alpha is the learning rate, multiplied by the derivative term or slope of the function
-- in code, we will denote the weight update as "dw" and the bias updated as "db"
+- in code, we will denote the weight update as "dw" and the bias updated as "db" (with respect to the function)
+- code, "dvar" will represent the derivative of the final output variable you care about, such as J
+
+- With gradient descent, our goal is to compute the derivatives WRT the loss, as we want to change w & b to descend to the lowest loss
+- For logistic regression, the formula for the derivative of the loss WRT z:= 
+dL/da = a - y
+
+
+** Vectorisation
+
+
+== WEEK 3 - SHALLOW NEURAL NETWOKS ==
+
+Notation:
+- x^(i)    ==> i'th training example
+- x^(i)[j] ==> j'th layer, i'th training example
+
+- a[0] = X  ==> activations of the input layer (ie: features)
+- a[1]    	==> activations / features of hidden layer, 
+			ie: a1[1] = first feature / node of hidden layer
+- a[2] = ŷ  ==> output layer 
+- this is a 2-layer neural network, as it doesnt include the input layer
+
+Calculations:
+z[1] = W[1]x + b[1] --> a[1] = σ(z[1]) --> z[2] = W[2]a[1] + b[2] --> a[2] = σ[z[2]) := ŷ --> L(a[2],y)
+
+Activation Functions:
+- we've been using sigmiod function, so a[1] = σ(z[1]), and so on
+- instead, we can use a different activiation function, say, a[1] = g(z[1]), where g = non-linear function 
+- options:
+> sigmoid,      σ(z[1]) = 1/(1+e^-(z[1]))     			==> features: {0,1}, crosses x=0 at y=0.5, smooth function, best for output layer
+> tanh,         (e^z[1] - e^-z[1]) / (e^z[1] + e^-z[1]) ==> features: {-1,1}, crosses x=0 at y=0, smooth function, is like a down-shifted sigmiod function, better than sigmoid for hidden layers
+> ReLU,         a = max(0, z[1])    					==> features: constant slope, so activation learning is consistent / faster across all real positive scalars, default choice with good learning
+> leaky relu,   a = max(0.01z[1], z[1])    			    ==> features: slight decline in slope for all real negative scalars
+
+- tanh activation usually works better than sigmoid activation function for hidden units because the mean of its output is closer to zero, and so it centers the data better for the next layer
+- sigmoid activation function is good for binary classification in the output layer
+
+Derivatives of Activation Functions:
+- sigmoid:    g'(z) = g(z) . (1 - g(z)) = a . (1 - a) = 1/(1+e^-z) . (1 - 1/(1+e^-z)) 
+- tanh:       g'(z) = 1 - g(z)^2    	= 1 - a^2     = 1 - ( (e^z[1] - e^-z[1]) / (e^z[1] + e^-z[1]) ) ^2    
+- relu:       g'(z) = {0 if z < 0, 1 if z > 0, undef if z = 0}
+- lrelu:	  g'(z) = {0.01 if z < 0, 1 if z > 0, undef if z = 0}
+
+Back Propagation:
+- compute the loss function gradient with respect to inputs, including activation function - g(z) - and z function and inputs w and b
+- da, dz, dw / db ...
+
+Random Initialisation:
+- do not set weights to zero, or each node will have the same activitations - ie: symmetry - and will be indistinguishable
+- do not set weights to be large as this will cause the inputs of the tanh to also be very large, thus causing gradients to be close to zero. The optimization algorithm will thus become slow.
+- solution: initialise with random weights, np.random.randn((n,m)) * 0.01; the bias can be initialised to 0
+
+
+== WEEK 4 - DEEP NEURAL NETWORKS ==
+
+- number of layers, L, includes all hidden layers + output layer - it does not include the input layer
+- n[l] = number of nodes / units in each layer
+- input layers = layer 0, hidden = layer 1 --> L-1, output = layer L-1
+- activation, a[l] = g[l](z[l)
+- weights, w[l] for z[l]
+- biases, b[l] for z[l]
+- a[L] = final activation in output layer
+
+Forward Propagation:
+- single example activation:
+> z[1] = w[1]a[0] + b[1],  where: x = a[0]
+> a[1] = g[1](z[1])
+> z[2] = w[2]a[1] + b[2]
+> a[2] = g[2](z[2])
+...
+> z[L] = w[L]a[L-1] + b[L]
+> a[L] = g[L](z[L])
+> ŷ    = a[L]
+
+Matrix Dimensionality:  [[ very important ]]
+- z[l] 	 = (n[l],   1)
+- w[l]	 = (n[l],   n[l-1])
+- a[l-1] = (n[l-1], 1) 
+- b[1] 	 = (n[l],   1)
+therefore:
+- a[l]   = (a[l],   1)
+
+so, where m = number of examples:
+- Z[l] 	 = (n[l],   m)
+- W[l]	 = (n[l],   n[l-1])
+- A[l-1] = (n[l-1], m) 
+- B[1] 	 = (n[l],   1)  --> this is "broadcast" into all examples, m
+therefore:
+- A[l]   = (a[l],   m)
+
+Backward Propagation:
+- equations in lecture "Forward and Backward Propagation" at 04:35
+- & in lecture "What does this have to do with the brain?" at 00:25
+
+Hyperparameters:
+- learning rate, α
+- regularisation rate, ƛ
+- choice of activation functions
+- number of hidden units, n
+- number of hidden layers, L
+- number of iterations
+- momentum
+- minibatch size
+- 
 
