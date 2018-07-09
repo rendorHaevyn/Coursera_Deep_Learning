@@ -1,9 +1,10 @@
+COURSE 01 of 05: NEURAL NETWORKS AND DEEP LEARNING. 
+
 INDEX:
 == WEEK 1 - INTRODUCTION ==
 == WEEK 2 - NEURAL NETWORK BASICS ==
 == WEEK 3 - SHALLOW NEURAL NETWOKS ==
 == WEEK 4 - DEEP NEURAL NETWORKS ==
-
 
 == WEEK 1 - INTRODUCTION ==
 > ReLU, rectified linear unit, can be used as the most basic neural network

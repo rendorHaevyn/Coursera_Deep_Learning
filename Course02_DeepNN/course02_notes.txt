@@ -1,0 +1,43 @@
+COURSE 02 of 05: IMPROVING DEEP NEURAL NETWORKS: HYPERPARAMETER TUNING, REGULARIZATION AND OPTIMIZATION
+
+INDEX:
+== WEEK 1 - PRACTICAL ASPECTS OF DEEP LEARNING ==
+== WEEK 2 - OPTIMIZATION ALGORITHMS ==
+== WEEK 3 - HYPERPARAMETER TUNING BATCH NORMALIZATION PROGRAMMING FRAMEWORKS ==
+
+== WEEK 1 - PRACTICAL ASPECTS OF DEEP LEARNING ==
+> Applied ML is highly iterative: idea --> code --> experiment (change hyperparameters) --> idea...
+> Training / hold-out or OOB or cross-vaidation or development set / test set
+- train on training set
+- determine which model hyperparameters set works best on the cross-vaidation set
+- then evaluate final model on the test set for an unbiased estimate [test: to provide an unbiased estimate of the performance of the final model]
+> in teh era of big-data (1million+ rows), the splits: train/CV or development/test can be something like 980k/10k/10k
+- it's no longer common practice to go 60%/20%/20%!
+> ensure that development and test sets have the same distribution of labelled data as does the training set (ie: K-fold stratified)
+
+> Bias vs variance:
+- bias = to underfit
+- variance = to overfit
+- if HIGH BIAS (underfitting training set well):
+-- bigger network, more hidden layers, more hidden nodes
+-- run the model for more iterations
+-- change optimisation function
+-- try different neural network architecture
+- if HIGH VARIANCE (overfitting training set):
+-- increase data, try regularisation of parameters
+-- try different neural network architecture
+
+
+
+
+
+
+== WEEK 2 - OPTIMIZATION ALGORITHMS ==
+
+
+
+
+
+
+== WEEK 3 - HYPERPARAMETER TUNING BATCH NORMALIZATION PROGRAMMING FRAMEWORKS ==
+
