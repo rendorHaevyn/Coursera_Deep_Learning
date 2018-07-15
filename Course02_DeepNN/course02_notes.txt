@@ -27,7 +27,106 @@ INDEX:
 -- increase data, try regularisation of parameters
 -- try different neural network architecture
 
+> L2 & L1 Regularization:
+- In logistic regression we can regularize modelled weights by adding a cost for those weights to the cost function
+- L2 regularise (euclidean): ƛ / 2m * ||w||^2 
+-- also called the "Frobenius norm"
+-- The Frobenius norm, sometimes also called the Euclidean norm (a term unfortunately also used for the vector L^2-norm), is matrix norm of an m×n matrix "A" defined as the square root of the sum of the absolute squares of its elements
+-- L2 regularisation is also called "weight decay", as the weights are penalised
+-- where: ƛ = regularisation parameter and ||w|| is the norm of the weights
+-- ||w||^2 = wT * w, or the squared of the euclidean norm
+- L1 regularise: ƛ / m * ||w|| 
+-- if L1 is used, w will be sparse, which means there will be a lot of zeros in it
 
+> Regularization and overfitting:
+- Regularising weights reduces the z function (w[l].a[l-1] + b[l]), forcing it into linear range for activiation functions (like: sigmoid, tanh)
+- So essentially, we can end up with a model --> linear model, as regularisation increases
+
+> "Inverted" Dropout Regularization:
+- for each feature by example, a random dropout of that node is applied (ie: 20%)
+- to adjust for this random dropout, the activation vector is divided by the probability of retaining (ie: 1-0.2=0.8)
+-- this ensures that the activation values, a[l-1], are adjusted up to account for the dropout
+- dropout works by spreading weights across different features - due to actual "dropout", the algorithm cannot rely one any singular feature to describe the output
+- dropout probabibilty can be varied across different layers
+-- typically unlikely that dropout would be applied to the input layer or the final output layer
+
+> Other tips:
+- Augment Data: modify images / inputs a little to create additional labelled data points
+- Early Stopping: stop training of neural network early, reducing overfitting of training set and improving generalisation to test set
+-- the downside of early stopping is that the cost function (gradient descent) is not being optimised, and the prevention of overfitting is also being mixed in
+
+> Normalising inputs:
+- scale by subtracting mean and divide by sigma squared (variance)
+- this needs to be done for all training, dev and test data sets
+- we normalise so that the cost function is more symmetric, and gradient descent is more efficient
+
+> Vanishing and Exploding Gradient:
+- with deep neural networks, if the layer weights are initialised to:
+a. greater than the identify matrix: then the activiation function and gradients can "explode" exponentially in value by the time layer L is reached, ie: A[L] & dA/dL = very high
+a. less    than the identify matrix: then the activiation function and gradients can "vanish" exponentially in value by the time layer L is reached,  ie: A[L] & dA/dL = extremely low
+
+> Weight initialisation for deep networks:
+- can better solve problem of vanishing or exploding networks
+- random assingment of values, and then modify based upon the activation function being usesd, ie:
+-- ReLU: W(l) = random * sqrt(2/n(l-1))   ==> "He" initialisation
+-- tanh: W(l) = random * sqrt(1/n(l-1))   ==> "Xavier" initialisation
+
+> Gradient Checking:
+- Gradient checking verifies closeness between the gradients from backpropagation and the numerical approximation of the gradient (computed using forward propagation).
+- Gradient checking is slow, so we don't run it in every iteration of training. You would usually run it only to make sure your code is correct, then turn it off and use backprop for the actual learning process.
+- assists with determing whether backpropagation is being calculated correctly
+- steps:
+-- reshape all thetas (W, B) into a big concatenated vector
+-- do an approximate gradient estimate using ε
+-- check whether euclidean norm for ε gradient is similar to calculated gradient
+
+- NOTES: 
+-- gradient checking should only be usesd for debugging, and NOT for training
+-- if algorithm fails grad check, look at components to identify bug
+-- remember regularisation
+-- grad check doesnt work with dropout
+-- run grad check at random initialisation and after some training to determine if results are similar
+
+** Good weight & bias INITIALISATION will **
+- Speed up the convergence of gradient descent
+- Increase the odds of gradient descent converging to a lower training (and generalization) error
+- The weights  W[l]  should be initialized randomly to break symmetry.
+- It is however okay to initialize the biases  b[l]  to zeros. Symmetry is still broken so long as  W[l]  is initialized randomly.
+- Poor initialization can lead to vanishing/exploding gradients, which also slows down the optimization algorithm.
+- If you train this network longer you will see better results, but initializing with overly large random numbers slows down the optimization.
+- Summary notes:
+-- Different initializations lead to different results
+-- Random initialization is used to break symmetry and make sure different hidden units can learn different things
+-- Don't intialize to values that are too large
+-- "He" initialization works well for networks with ReLU activations.
+
+** L2 REGULARIZATION Implementation Notes **
+- The cost computation:
+-- A regularization term is added to the cost
+- The backpropagation function:
+-- There are extra terms in the gradients with respect to weight matrices
+- Weights end up smaller ("weight decay"):
+-- Weights are pushed to smaller values.
+- Intuition:
+-- L2 regularization relies on the assumption that a model with small weights is simpler than a model with large weights. 
+-- By penalizing the square values of the weights in the cost function you drive all the weights to smaller values. 
+-- It becomes too costly for the cost to have large weights! This leads to a smoother model in which the output changes more slowly as the input changes.
+- Summary notes:
+-- Regularisatioan reduces overfitting and drives weights to lower values
+-- The value of  λ  is a hyperparameter that you can tune using a dev set.
+-- L2 regularization makes your decision boundary smoother. If  λ  is too large, it is also possible to "oversmooth", resulting in a model with high bias.
+
+** DROPOUT Implementation Notes **
+- Dropout is a regularization technique that is specific to deep learning. It randomly shuts down some neurons in each iteration.  
+- At each iteration, you train a different model that uses only a subset of your neurons. 
+- With dropout, your neurons thus become less sensitive to the activation of one other specific neuron, because that other neuron might be shut down at any time.
+- Summary notes:
+-- Dropout is a regularization technique.
+-- You only use dropout during training. Don't use dropout (randomly eliminate nodes) during test time.
+-- Apply dropout both during forward and backward propagation.
+-- During training time, divide each dropout layer by keep_prob to keep the same expected value for the activations. 
+For example, if keep_prob is 0.5, then we will on average shut down half the nodes, so the output will be scaled by 0.5 since only the remaining half are contributing to the solution. 
+Dividing by 0.5 is equivalent to multiplying by 2. Hence, the output now has the same expected value. You can check that this works even when keep_prob is other values than 0.5.
 
 
 
