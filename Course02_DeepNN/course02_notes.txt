@@ -129,14 +129,98 @@ For example, if keep_prob is 0.5, then we will on average shut down half the nod
 Dividing by 0.5 is equivalent to multiplying by 2. Hence, the output now has the same expected value. You can check that this works even when keep_prob is other values than 0.5.
 
 
-
-
 == WEEK 2 - OPTIMIZATION ALGORITHMS ==
+> Mini-batch gradient descent
+- with big data, training on the entire training set, or batch, can be very slow
+- a solution is to train on mini-batches of, say, 1,000 examples, which speeds up the gradient descent
+- with mini-batch, the cost function might not decrease smoothly, as we're training on different subset examples each iteration
+- "stochastic" gradient descent is where the mini-batch size is 1 (ie: online learning)
+-- stochastic gradient descent is very noisy, and heads towards the minimum, however, will never converge
+- batch gradient descent (examples=m) --> mini-batch --> stochastic (examples=1)
+- choices:
+-- small training set (m=2000) - use batch gd
+-- typical mini-batch size - 2^6 to 2^9
+- before mini-batch, the training data need to be shuffled and then partitioned
 
+Notation: use {t} to denote the batch, t
 
+> Exponentially weighted moving average
+Vt = βVt-1 + (1-β)θt  -- ie: a weight by the previous value, plus a proportion of the current observation
+- very efficient and simply one-line-of-code to estimate moving averages across multipel variables
 
+Bias Correction:
+- early on the estimates can under-estimate the averages, so a "bias correction" can address this, thus implement:
+Vt = βVt-1 + (1-β)θt / (1-β^t)  -- as the number of iterations increase, this bias adjustment decreases in effect
 
+> GD Alternative: Gradient descent with Momentum
+- Momentum takes past gradients into account to smooth out the steps of gradient descent. It can be applied with batch gradient descent, mini-batch gradient descent or stochastic gradient descent.
+- faster than standard gradient descent
+- exponentially weighted moving average of the gradients, which is used to determine gradient descent
+- reduces oscillation which would otherwise slow down gradient descent and prevent the use of a larger learning rate
+-- ie: the ball is allowed to roll down the gradient, gaining momentum, without spinning out to the side
+- typically a β=0.9 is used, so we're averaging over the last 10 iterations gradient
+How do you choose  β ?
+1. The larger the momentum β is, the smoother the update because the more we take the past gradients into account. But if β is too big, it could also smooth out the updates too much.
+2. Common values for β range from 0.8 to 0.999. If you don't feel inclined to tune this, β=0.9 is often a reasonable default.
+3. Tuning the optimal β for your model might need trying several values to see what works best in term of reducing the value of the cost function J.
+
+> GD Alternative: RMSprop (Root Mean Square prop)
+- the derivatives are squared (at some point?) and later a squared root is applied
+- reduces oscillation which would otherwise slow down gradient descent and prevent the use of a larger learning rate
+- parameters: β, ε
+
+> GD Alternative: Adam optimisation (Adaptive moment estimation)
+- takes Momentum (including bias correction) and RMSprop and uses them together
+- hyperparameters: ɑ (tune this!), β (Momentum, ~0.9), β (RMSprop, ~0.999), ε (10^-8)
+1. It calculates an exponentially weighted average of past gradients, and stores it in variables ʋ (before bias correction) and ʋ-corrected (with bias correction).
+2. It calculates an exponentially weighted average of the squares of the past gradients, and stores it in variables ss (before bias correction) and scorrectedscorrected (with bias correction).
+3. It updates parameters in a direction based on combining information from "1" and "2".
+
+> Learning Rate Decay:
+- decay the learning rate over time to assist with convergence
+- an "epoch" represents a pass of the entire training dataset, when using mini-batches
+- we can decay the learning rate according to the number of epochs (full training set passes)
+- eg:
+-- linear decay:  				ɑ = ɑ0 * 1/(1 + decay_rate * nbr_epochs)
+-- exponential decay: 			ɑ = ɑ0 * 0.95^(nbr_epochs)
+-- square root epoch decay: 	ɑ = ɑ0 * 1/sqrt(nbr_epochs)  	, where k = constant (say, 1)
+-- binary decay:				ɑ = ɑ0 * 0.5^(nbr_epochs)
+-- square root mini-batch decay:ɑ = ɑ0 * k/sqrt(t)   			, wherk k = constant and t = number of mini batches
+
+> Local optima
+- with high-dimensional spaces
+-- we are more likely to encounter saddle points than get stuck in bad local optima
+-- plateaus (long, flat regions) can slow down learning 
+-- thus algos like Momentum/RMSprop/Adam can help pertubate learning along plateaus and find the next path to descent
 
 
 == WEEK 3 - HYPERPARAMETER TUNING BATCH NORMALIZATION PROGRAMMING FRAMEWORKS ==
+> Hyperparameter tuning, order of importance:
+1.1 ɑ learning rate
+2.1 β (Momentum gradient descent)
+2.2 mini-batch size
+2.3 # hidden units
+3.1 # layers
+3.2 learning rate decay & learning rate decay method
+4.1 Adam algorithm - typically dont bother tuning these: β1 (adam first moment), β2 (adam second moment), ε
+
+- Approach
+-- try a random values, rather than a grid (list) of values: this will increase the variety of values utilised in the search
+-- start with a "coarse" search, then when a good space is found, zoom in with "fine" search
+-- for parameters which exist across a large range, log sampling might be a good approach to select evenly over the range, ie: randomly select float (-a:b) then raise to power 10 for hyperparameter
+eg: for β hyperparameter, consider range 0.9--0.999, which is like (1-β):{0.1,0.001}, so (1-β) ranges from 10^-1--10^-3, take random value r=-3:-1, raise 10^-r for hyperparameter value
+-- train 1 or 2 models in small iterations / steps and zoom-in on successes, or, train a lot of models in parallel
+
+> Batch Normalisation
+- first, we have normalised the input features, a[0]
+- second, we normalise the linear activations at each layer, z[1]-->z[L-1]
+-- note: we normalise the linear activation, not the transform activations (ie: ReLU, sigomid, tanh, etc)
+- the z's are normalised, then modified according to parameters ɣ and β
+step 1: z[l](norm) 	= (z[l] - mu) / sqrt(variance + epsilon)
+step 2: z[l](tilda) = ɣ * z[l](norm) + β
+- these parameters, ɣ and β, are learnable hyperparameters
+
+
+
+
 
