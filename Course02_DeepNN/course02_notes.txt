@@ -216,9 +216,33 @@ eg: for β hyperparameter, consider range 0.9--0.999, which is like (1-β):{0.1,
 - second, we normalise the linear activations at each layer, z[1]-->z[L-1]
 -- note: we normalise the linear activation, not the transform activations (ie: ReLU, sigomid, tanh, etc)
 - the z's are normalised, then modified according to parameters ɣ and β
-step 1: z[l](norm) 	= (z[l] - mu) / sqrt(variance + epsilon)
-step 2: z[l](tilda) = ɣ * z[l](norm) + β
+step 1 - normalise: z[l](norm) 	= (z[l] - mu) / sqrt(variance + epsilon)
+step 2 - adjust: 	z[l](tilda) = ɣ * z[l](norm) + β
 - these parameters, ɣ and β, are learnable hyperparameters
+- NOTE: batch norm zeros out the means of the Z arrays, which is akin to getting rid of the bias term; this term (b) is generally replaced by the β parameter
+- batch norm is calculated on each mini batch, thus adding some noise to the z[l] values calculated, that has a 'regularisation' effect
+
+- At test time:
+-- the average and variance are estimated using an exponentially weighted moving average, which is the final updated value at the end of the mini-batches during training
+
+> Softmax regression
+- used for multi-class classification
+- essentially just takes the final layer linear activation and determines each row as a proportion of the final layer sum
+-- this becomes the class proportional allocation
+-- the softmax classifier takes in a vector and outputs a vector
+- "hardmax", in contrast, assigns a binary output vector with the highest proportion class taking 1, and the rest 0 (rather than soft probabibilty)
+
+> Tensorflow:
+Tensorflow is a programming framework used in deep learning
+The two main object classes in tensorflow are Tensors and Operators.
+When you code in tensorflow you have to take the following steps:
+-- Create a graph containing Tensors (Variables, Placeholders ...) and Operations (tf.matmul, tf.add, ...)
+-- Create a session
+-- Initialize the session
+-- Run the session to execute the graph
+You can execute the graph multiple times as you've seen in model()
+The backpropagation and optimization is automatically done when running the session on the "optimizer" object.
+
 
 
 
