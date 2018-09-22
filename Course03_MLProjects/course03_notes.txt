@@ -1,0 +1,92 @@
+COURSE 03 of 05: STRUCTURING MACHINE LEARNING PROJECTS
+
+INDEX:
+== WEEK 1 - MACHINE LEARNING STRATEGY 1 ==
+== WEEK 2 - MACHINE LEARNING STRATEGY 2 ==
+
+== WEEK 1 - MACHINE LEARNING STRATEGY 1 ==
+> Single number evaluation metrics
+- Such as, F1 score, which is the harmonic mean of precision (of those labelled as true-+ve, what % are actually true-+ve) & recall (of those actually true-+ve, what % were identified as true-+ve)
+- A single eval metric can assist with quickly evaluating overall prediction results from several models
+
+> Satisficing vs Optimising metric
+- For example, we might say "we want to optimise accuracy (optimising), subject to a threshold for run time of < 100ms (satisficing)"
+
+> Train vs Dev vs Test sets
+- Dev set is aka Cross-validation or Hold-out
+- Randomly shuffle training data and split into dev and test sets
+- Ensure that the distributions are the same
+- Train ==> train teh model; Dev ==> evaluate various trained interim models; Tets ==> evaluate the "final" model
+- Splits: with the era of large data, say 1m examples, we can do something like this: 98% train, 1% dev, 1% test,  ie: (980k/10k/10k)
+- Test teh test set to be large enough to have overall confidence in your system
+
+> Bias / Variance Analysis (Comparing to human level performance)
+- Bayes optimal error is the most optimal error level that a model could hope to achieve
+- if model is worse than human level performance, you can:
+* get labelled data from humans
+* gain insight from manual error analysis - why did a person get this correct?
+* get better analysis of BIAS / VARIANCE focus of model development
+  ~ eg: if the best error is 1% and the model test / dev error is 8% / 10%, FOCUS ON AVOIDABLE BIAS (underfitting) to improve the test error as there is room for improvement to Bayes (best) error (ie: hyperparams / model architecture / RMS prop or ADAM or momentum)
+  ~ eg: if the best error is 7.5% and the model test / dev error is 8% / 10%, FOCUS ON VARIANCE (overfitting) to improve dev error as the test error is close to optimal (ie: L2 regularise / dropouts / data augmentation / more data / NN architecture)
+
+- human level performance is often surpassed by ML in structured data (online advertising, loan approvals, logistics, product recommendations)
+- humans tend to be better at natural perception (sounds, visual detection)
+
+
+== WEEK 2 - MACHINE LEARNING STRATEGY 2 ==
+> Error Analysis
+- establish ceiling on performance (best outcome) of trying different strategies to reduce error in labelling
+- spreadsheet out different ideas / analysis of the types of error in parallel, to figure out what to spend time on for fixing in future iterations
+- if labelled data is sometimes incorrectly labelled, deep learning methods are typically robust to random erros in the training set, but not systematic errors
+- errors to evaluate:
+* overall dev set error
+* errors due to incorrect labelling
+* errors due to other causes (ie: mislabelling, blurry images, etc) --> review mislabelled images to determine what characteristics they may share
+
+> Build the first system quickly, then iterate
+- set up a dev/test set single eval metric
+- build initial system quickly
+- use Bias / Variance and Error Analysis to determine next steps
+
+> Mismatched Training and Dev / Test Sets
+- in some cases, we might find that we want to test on a different distribution of data (ie: user images) from training, but the volume are low
+- here, we might stack dev / test with the user images, but use the professional / web images for the training set
+- so, we need to check for error across different spaces:
+* A. Human level error
+* B. Train set error
+* C. Train-dev set error (matches the distribution of the training set, but is not trained)
+* D. Dev set error (the distro may differ from the train set)
+* E. Test set error
+- so, what do these differences in error tell us?
+A. to B. : avoidable bias (model underfitting Train set)
+B. to C. : variance (model overfitting Train set, degree to which the model generalises)
+C. to D. : whether data mismatch error exists (different distributions?)
+D. to E. : degree of overfitting to Dev set
+
+> Transfer Learning
+- we can use pre-learning or pre-learnt weights from other deep learning models and apply them to a new data set
+- the new data set can be fine-tuned, with the final layer weights nuked, and randomly initialised for the new data set 
+- transfer learning makes senese when:
+* transferring from A to B
+* A and B have the same input, X (ie: images / audio)
+* when data for A >> data for B
+* low level features from A could be useful for training toward B
+
+> Multi-task Learning
+- involves training a deep learning network to characterise multiple labels, for example: predict whether an image has a stop sign, a car, a pedestrian, lights
+- this DL model integrates predictions for four classes, and shares the low-level object detection 
+- multi-task learnign makse sense when:
+* classifications can benefit from sharing low-level features
+* when the available data for each task is similar
+* when a big enough NN can be trained to do well on all classifications (tasks)
+
+> End to End Learning
+- when models take input data and predict the output directly, without intermediatry feeds
+* eg: predicting child age from hand xrays - traditionally, we might segment out bones from the xray, and predict from that; EtE learning would just predict from the entire image
+- EtE Learning does require a large quantity of data to succeed, however
+- Pros:
+* Lets the data speak, without abstracting away from the actual data into human constructs
+* Less hand designing of components needed
+- Cons:
+* Large amount of data required
+* Excludes useful hand designed components (features, components, etc...)
