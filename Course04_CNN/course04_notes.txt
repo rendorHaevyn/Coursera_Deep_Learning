@@ -7,6 +7,71 @@ INDEX:
 == WEEK 4 - SPECIAL APPLICATIONS: FACE RECOGNITION & NEURAL STYLE TRANSFER ==
 
 == WEEK 1 - CONVOLUTIONAL NEURAL NETWORKS ==
-> Header
-- Note
-* subnote
+> Convolutions
+- a convolution involves applying a "filter" (or, kernel) to the input data
+- we are "convolving" the input data with a filter
+- say we had a 6 x 6 input image, and a 3 x 3 filter (1,1,1;0,0,0;-1,-1,-1), we:
+* mutiply the filter by a matched segment of the image, get the sum product, report a single output
+* for a 6 x 6 image, with a 3 x 3 filter, this produces a 4 x 4 "image" output
+* this would appear as conv2d in keras / tf
+
+> Edge detection:
+- positive to negative edges refers to light to dark or dark to light edges
+- different filters (or, kernels) allow for detection of diffent types of edges (say, horizontal or vertical)
+- we can let the NN learn the filter parameters, so that the edge detection can be performed in a way that suits the data being read
+
+> Padding & Applying filters:
+- a (n x n ) image convolved with an (f x f) filter produces a ((n - f + 1) x (n - f + 1)) output image
+- applying fliters can lead to 
+* shrinking output (ie: smaller output image)
+* information at corners / extremes of the image are used less often than those towards the center, so information is being lost
+- Padding allows us to add a border of zeros around the image, which can help preserve the output size after convolution, and retain all information at the extremes
+* so: 
+(n x n ) image, with padding (p), convolved with an (f x f) filter produces a ((n + 2p - f + 1) x (n + 2p - f + 1)) output image
+- padding is referred to as:
+"valid" means "no padding".  
+"same" results in padding the input such that the output has the same length as the original input. 
+
+> Stride:
+- affects the shift of the filter across the image, ie: stride of 2 will shift the filter by two columns and rows 
+* so: 
+(n x n ) image, with padding (p), and stride (s), convolved with an (f x f) filter produces a ((n + 2p - f) / s + 1) x ((n + 2p - f) / s + 1) output image
+- if there's a partial overlap of the filter with the imgage, then an output value will not be produced
+
+> Multi-channel image convolution:
+- 3D filters (H x W x Channel / Depth) is also available for image convolutions
+- the number of channels in the filter (depth) must match the number of channels in the image
+- as earlier, a (6 x 6 x 3) image convolved with a (3 x 3 x 3) filter will produced a (4 x 4) output, assuming valid padding and stride of 1
+* so: 
+(n x n x nc) image, with padding (p), and stride (s), convolved with an (f x f x nc) filter produces a ((n + 2p - f) / s + 1) x ((n + 2p - f) / s + 1) output image, where nc = number of channels
+- we can apply different filters (kernels defined differently) of same shape to the input image, then stack the outputs!!
+* ie: for example, we can have a filter for vertical edge detection, horizontal edge detction, and other types of edge detction...awesome!
+
+> A Layer of a ConvNet:
+1. Apply filter to the image
+2. Add bias (b) to each cell of the output
+3. Apply non-linear activation function (ie: ReLU) to the output
+4. Repeat for each filter used, then stack up the outputs to form a Layer of a ConvNet
+
+- The values of the filters become the Weights applied to the input image that the DL NN will learn, as well as the Bias
+
+- Notation:
+f[l] = filter size in layer l
+p[l] = padidng in layer l
+s[l] = stride in layer l
+nc[l] = number of filters
+input: n[l-1]H x n[l-1]W x nc[l-1] = the height, width and # channels output from the previously layer, becoming input in the current layer, l-1
+output: n[l]H x n[l]W x nc[l], where nc[l] is given the number of filters in the current layer
+thus (for height & width):
+n[l]H = (n[l-1]H + 2p[l]- f[l]) / s[l] + 1
+each filter is:
+f[l] x f[l] x nc[l-1]
+activations:
+a[l] = n[l]H x n[l]W x nc[l]
+A[l] = m x n[l]H x n[l]W x nc[l], where m reflects # of examples, such as during batch gradient descent
+weights:
+f[l] x f[l] x nc[l-1] x nc[l], where nc[l] is # filters in current layer
+bias:
+nc[l], a single bias parameter for each filter in the current layer
+
+
