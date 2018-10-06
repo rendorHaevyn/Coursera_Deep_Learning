@@ -74,4 +74,84 @@ f[l] x f[l] x nc[l-1] x nc[l], where nc[l] is # filters in current layer
 bias:
 nc[l], a single bias parameter for each filter in the current layer
 
+> Pooling layer:
+- max pooling takes the max of values within a filter; average pooling, the average within a filter
+- parameters include:
+* filter size (ie: 2 x 2, 3 x 3)
+* stride (ie: slide across 1, 2 steps)
+* typically padding is not used
+- the max pooling is applied likewise to each of the channels in the input layer
+- as there there are no parameters to learn, there is nothing for backprop to adjust 
 
+> Convolutions with Pooling:
+- typically a layer will have a convolution applied, followed by a pooling activations
+- together, these are regarded as a single layer in the ConvNet
+
+> Architecture:
+- typical pattern: Conv/Pooling --> Conv/Pooling --> FullyConnected (FC) --> FC --> softmax output
+- the activation size tends to slowly decrease from input through output layer
+
+> Why Convolutions?
+- significantly reduces number of parameters to train (just the filter size by # of filters)
+- Parameter Sharing: filters share parameters across the entire input image 
+- Sparsity of Connections: each output value only depends on a small number of input values (ie: it's not fully connected!)
+
+
+== WEEK 2 - DEEP CONVOLUTIONAL MODELS: CASE STUDIES ==
+> Case Studies
+1. Le Net 5
+- two filter layers, including: filter --> activation --> average pooling
+- sigmoid / tanh activation
+- height & width decreased over the layers, while the channels increased
+- finished with two fully connected layers, with a single y-hat prediction
+- about 60k parameters
+2. AlexNet
+- 4 channel images
+- ReLU activation 
+- filter / max pool / filter / max pool / filter / filter / filter / max pool / FC1 / FC2 / softmax
+- 60m parameters
+3. VGG-16
+- 3 channel images
+- 2 * filter (64 channel) / max pool / 2 * filter (128 channel) / max pool / 3 * filter (256 channel) / max pool / 3 * filter (512 channel) / max pool / 3 * filter (512 channel) / max pool / FC1 / FC2 / softmax
+- 138m parameters
+
+> Residual Nets
+- very deep networks shoudl in theory train towards a reduction in the loss function, however, increased depth can give rise an upward bend in the loss function, suggesting nets are harder to train
+- a proposal was create "Residual Blocks", where additional data can skip some layers and feed into a later linear function, prior to activiation (ie: ReLU)
+- this seems to improve training efficacy (loss) with deeper layers -- this is called a "short circuit" connection
+- basically, the identity function is easy for the Residual Block to learn
+- Using a skip-connection helps the gradient to backpropagate and thus helps you to train deeper networks
+- with the skip, we need to ensure that the added layer input to the later layer has teh same dimensions, thus, many network use "same" padding to retain layer width & height dimensions
+
+> Network in Network - 1 x 1 x nc convolution
+- these can help shrink the number of channels (or grow them!)
+- simply multiplys a value by a 1 x 1 unit, through all layers
+- facilitiates for addition of non-linearity (ie: ReLU)
+
+> Inception Network
+- what this does is basically stack up multiple convolutions (with the same width & height) - in the channel direction
+- this allows use to try multiple ideas, such as different filters, channels, and pooling layers, in one hit
+- by using a 1 x 1 convolution, we can use this as a "bottle neck" to reduce the number of computations in getting the desired output ==> of course, you'll end up with far fewer parameters, however, it trains much faster
+
+> Transfer Learning
+- what one can do is copy teh weights from a previously trained network, and just train with changes to the softmax output layer
+- this is known as freezing the training layers, and framworks such as Keras support this 
+- if one has a lot of training data, we could choose just to freeze the early layers, and train on the later layers
+- freezing allows us to use the weights trained by others - weights that might be good for identifying basic features - and focus on the final image detection
+- at the very least, pre-trained weights are a good beginning for weight initialisation
+
+> Data Augmentation
+- mirroring images
+- random cropping
+- rotation
+- shearing
+- local warping
+- colour shifting (R,G,B channels), according to a sensible distribution, ie: PCA colour augmentation
+
+> Winning on benchmarks
+- ensembling (average predictions from multiple models)
+
+> use open source code, as benefits include"
+- literature published network architectures
+- open source implementations
+- pre-trained models, allowing one to focus on fine tuning
