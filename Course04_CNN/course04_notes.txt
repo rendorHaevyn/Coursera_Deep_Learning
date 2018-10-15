@@ -155,3 +155,78 @@ nc[l], a single bias parameter for each filter in the current layer
 - literature published network architectures
 - open source implementations
 - pre-trained models, allowing one to focus on fine tuning
+
+
+== WEEK 3 - OBJECT DETECTION ==
+> Object Localisation
+- Notation:
+* top left of image: (0,0)
+* bottom right of image: (1,1)
+* center of object detected: bx,by
+* width of object detected: bw
+* height of object detected: bh
+
+> Network output:
+- network output is now: class label (ie: car/motorcycle/etc) and four boundary points (bx, by, bh, bw)
+- ie: y = [pc, bx, by, bh, bw, cx1, cx2, cx..., cxn], where: pc = probability there is an object in teh image (1 or 0), locations of image, and class of image (cx to cxn number of classes)
+
+> Sliding Windows detection:
+* Originally:
+- First: train network on cropped images of labelled data
+- Second: scan the larger image with a "sliding window", and pass these cropped images to the neural net to determine whether an object is detected
+- problems: very computationally expensive
+* With Convolutions:
+- treat fully connected layers as convolutions (1x1)
+- use a 2x2 max pool to generate an final layer which will match the sliding window
+- this allows the output to reflect all sliding windows at once
+
+* intersection over union (IoU): find proportion of bounding boxes that overlaps with object
+* non-max suppression: for boundign boxes that overlap, choose one with highest IoU, and rule out the others
+* anchor boxes: used to identify discrete objects in overlapping space - object is assigned a grid cell for object's midpoint and an anchor box for the grid cell with the highest IoU
+
+* y outputs: x grid cells * y grid cells * # anchor boxes * vector n (ie: pc, bx, by, bh, bw, c1, c2, c3, cn classes .... repeat for other anchor box)
+  
+
+== WEEK 4 - SPECIAL APPLICATIONS: FACE RECOGNITION & NEURAL STYLE TRANSFER ==
+> Verification vs recognition
+* Verification: 1:1 is this person who we think
+* Recognition: 1:K number of persons, so there's a 1 in K % chance of getting this wrong, so the Verification accuracy needs to offset this
+
+> One shot learning
+* recognise an image using a single training image of that person's face
+* can get around this by constructing a "similarity function", which measures teh difference between the image and a class, then chooses that which falls below a threshold (tau, τ)
+* once network is trained, feed in representative images, get output vector, and get the norm of the difference between these vectors - this is called "siamese neural network architecture"
+* we train a network to learn parameters such that if x(i) and x(j) are pictures of the same person, the norm of the distance between teh outupt encoding is very small, and if they are different people, the norm of the distance is large
+- that is, we consider triplets of an anchor (A, base image), positive (P, matched person), negative (N, non-matched person)
+- the distance must be such that: d(A,P) << d(A,N)
+
+* now, a problem is a network might train all the parameters train to produce alike encodings (A, P, N) such that difference functions all result in 0
+- to get around this, we add a "margin", ɑ, so: d(A,P) - d(A,N) + ɑ <= 0
+- thus, the loss function: L(A,P,N) = max(d(A,P) - d(A,N) + ɑ, 0)
+
+* During training, we want to choose triplets that are difficult to train on, ie: a non-matched face has very similar features to a matched face
+
+* Face verification as supervised learning:
+- train pairs of images, with binary classification where the pairs are matched, and 0 where they are not
+
+
+> Neural style transer
+* Extract features from different convnet layers and transferring them to other images
+* Layer 1:
+- edges
+- colours
+* Layer 2:
+- more complex textures
+* Deeper Layers:
+- increasing complexity
+- neurons become specialised
+
+* generated image is a function of a content image and a style image
+* cost function:
+- J(G) = alpha . J(content)(C,G) + beta . J(style)(S,G)
+- the generated image pixles are randomised, and we then train teh model the network to generate pixel values that minimise the difference between that pixel value and that of the alike style & content images
+
+* style cost function
+- measure correlations between layers
+- Let: a[l](i,j,k) = activation at (i,j,k).  G[l] is nc[l] x nc[l] style matrix (or, "gram matrix")
+(where: l=layer, i=height, j=width, ,k=channel)
