@@ -1,0 +1,80 @@
+COURSE 05 of 05: SEQUENCE MODELS
+
+INDEX:
+== WEEK 1 - RECURRENT NEURAL NETWORKS ==
+== WEEK 2 - NATURAL LANGUAGE PROCESSING & WORD EMBEDDINGS ==
+== WEEK 3 - SEQUENCE MODELS & ATTENTION MECHANISM ==
+
+
+== WEEK 1 - RECURRENT NEURAL NETWORKS ==
+> Notation:
+* x<t> - the position of word / item t in temporal sequence x
+* y<t> - the position of output associated with each word in temoral sequence x
+* Tx, Ty - number of words / items in the sequence
+* x(i)<t> - the t'th position of training example in
+
+* Word representations:
+- we could create a dictionary of words (vocabulary), then each word in a sequence takes on a sparse vector with a single 1 and the rest zeros for the match to the vocabulary list
+==> ie: One-hot encode
+
+> Recurrent neural nets
+* We dont use standard networks (Fully Connected layers) because:
+- inputs and outputs can be different lengths in different examples
+- they do not share features learned across different sequence positions, ie: DRG R63Z in position 1, but might not learn R63Z in position 10
+- a one-hot encoded input feature layer would result in a huge number of parameters and thus take an extremely long time to train
+
+* Unidirectional RNNs:
+- for each word in a sequence, an input layer is modelled and activated, with a prediction output made, then these activations are passed to the next word, and repeated
+- the same parameters, are used for each word in the sequence at each time step, including:
+--> W(ax), W(ay), W(aa)
+- ie: y^<3> takes information from x<3>, as well as activations input from x<1> and x<2>
+- so, data from earlier in the sequence flows to outputs later in the sequence
+
+- Forward propagation:
+-- we start off with a<0>, a vector of all zeroes
+--> a<t>  = g(W(aa).a<t-1> + W(ax).X<t> + b(a))
+--> y^<t> = g(W(ya).a<t> + b(y))
+-- the activations, a<t> are typically Tanh, and sometimes ReLU
+-- the activations, y^<t>, can be sigmoid (if binary prediction), or softmax (multiclass), etc
+
+- Backward propagation:
+-- Loss function (using cross entropy): L(y^,y) = Σ(t=1:T) -y<t>.log(y^<t>) - (1-y<t>)log(1-y^<t>), for all words t
+
+* Different RNN architectures
+- sometimes times the length of the inputs might not match the lenght of outputs, ie: long sequence --> predict sentiment (single integer), english phrase --> french phrase, etc
+- architecture representations can be: 
+-- many to many (ie: encoder [english], decoder [french])
+-- many to one
+-- one to one
+-- one to many (ie: music generation)
+
+* Vanishing gradients
+- can occur in deep RNNs (like deep FCNs) as later gradients have little impact upon earlier layer activations
+- this can mean tokens earlier in a sequence may not be computationally well related to tokens later in the sequence (which might be important)
+
+* Exploding gradients
+- where parameters become very large
+- may often observe NaNs in gradients
+- solution: gradient clipping (ie: re-scale gradient vectors to not be greater than some gradient threshold)
+
+> Gated Recurrent Units (GRUs)
+- uses a memory cell, "c", to retain status of an association between tokens in a sequence
+- uses a 'gate' to triger updates and relevance
+-- update gate for whether to update
+-- relevance gate to determine whether c<t-1> is relevant to computing the next candidate for c<t>
+- doesnt suffer from vanishing gradient, so is good for long range dependencies
+
+> Long Short Term Memory unit (LTSMs)
+- uses three gates:
+-- update, forget, output
+-- all gates use a<t-1> and x<t> to compute the gates 
+- uses Tanh to compute c~<t>
+
+> Bidirectional RNNs (BRNN)
+- does forward propagation for token (word) activations from 1-->t, as well as backward from t-->1
+- y^<t> = g(W(y)[a<t>-->, a<t><--] + by)
+- typically BRNNs are used with LSTM or GRU blocks
+- drawback: requires the full sentence at once (ie: makes it difficult for real time language processing)
+
+> Deep RNNs
+- typically only use a few layers because there are already many tokens connected in sequence
