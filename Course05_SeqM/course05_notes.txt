@@ -78,3 +78,26 @@ INDEX:
 
 > Deep RNNs
 - typically only use a few layers because there are already many tokens connected in sequence
+
+
+== WEEK 2 - NATURAL LANGUAGE PROCESSING & WORD EMBEDDINGS ==
+> Word Embeddings
+* Using one-hot encoded vectors for word representations, the RNN cannot generalise well between phrases, ie: i want a glass of apple / orange juice, RNN does not generalise context across apple / orange too well 
+* Creating a featured representation of word vectors allows us to associate features with each word, ie: feature associated with each DRG, such as gender, age, cost, size, etc, with these features normalised
+- regarded as a "feature vector" or "embedding"
+
+> Transfer learning with word embeddings
+1. Learn word embeddings from a large corpus (or download a pre-trained embedding); say, 1-100Bn words
+2. Transfer embedding to new training task with smaller data set; say, 100k words
+3. Fine tune the embeddings with new data
+
+> Word2Vec
+
+> Skip gram
+
+> Glove Algorighm (Global Vectors for Word Representation)
+* X(ij) = # times, i (t), a word appears in the context of j (c); where t = target and c = context
+
+> Sentiment classification RNN
+* when describing sentiment, word order is important in capturing this, ie: "lacking good taste" suggests that something was poor - the use of the word "good" here was not associated with positive ratings
+
