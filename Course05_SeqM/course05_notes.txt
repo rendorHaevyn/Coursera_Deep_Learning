@@ -101,3 +101,19 @@ INDEX:
 > Sentiment classification RNN
 * when describing sentiment, word order is important in capturing this, ie: "lacking good taste" suggests that something was poor - the use of the word "good" here was not associated with positive ratings
 
+
+== WEEK 3 - SEQUENCE MODELS & ATTENTION MECHANISM ==
+> Sentence to sequence architectures
+- Image captioning (ie: picture of cat on a chair --> "a cat sitting on a chair")
+* Pass image through CNN (like AlexNet) followed by dense layers
+* instead of outputting a softmax function (class detection), output to an RNN which can generate the caption, word-by-word
+* that is: Image --> CNN --> dense layer --> RNN --> sequence
+
+> Picking most likely sentence
+* use a 'beam search' (ie: maximise joint probability) rather than 'greedy search' (ie: maximise word-at-a-time probability) which maximises the probability of y^ given input sentence x
+
+> Beam Search
+
+> Attention Model
+- works on one part of sentence at a time (not the entire sentence)
+- uses weights, ɑ, which determine what 'attention' should be applied to local forein words when generating a translation
